@@ -1,20 +1,28 @@
 import express from 'express'
+import db from './config/dbConnect.js'
+import livros from './models/Livro.js'
+
+db.on("error", console.log.bind(console, "connection error"))
+db.once("open", () => {
+    console.log("database connection succeeded")
+})
 
 const app = express()
 
 app.use(express.json())
-
-const livros = [
-    {id: 1, titulo: 'O Senhor dos Anéis', autor: 'J.R.R. Tolkien'},
-    {id: 2, titulo: 'Harry Potter e a Pedra Filosofal', autor: 'J.K. Rowling'}
-]
 
 app.get('/', (req, res) => {
     res.status(200).send('Bem vindo a API de livros')
 })
 
 app.get('/livros', (req, res) => {
-    res.status(200).json(livros)
+    livros.find((error, livros) => {
+        if (error) {
+            return res.status(500).send(error)
+        } else {
+            return res.status(200).send(livros)
+        }
+    })
 })
 
 app.get('/livros/:id', (req, res) => {
